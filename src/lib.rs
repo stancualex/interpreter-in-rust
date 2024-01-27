@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq)]
+use std::collections::{hash_map::Values, HashMap};
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     Illegal,
     Eof,
@@ -21,10 +23,35 @@ pub enum Token {
     Let,
 }
 
+pub struct Keywords<'a> {
+    pub keywords: HashMap<&'a str, Token>,
+}
+
+impl<'a> Keywords<'a> {
+    pub fn new() -> Self {
+        Self {
+            keywords: HashMap::from([("fn", Token::Function), ("let", Token::Let)]),
+        }
+    }
+
+    pub fn get(&self, key: &str) -> Option<Token> {
+        return self.keywords.get(key).cloned();
+    }
+
+    pub fn values(&self) -> Values<'_, &str, Token> {
+        return self.keywords.values();
+    }
+}
+
 impl Token {
+    pub fn is_keyword(&self) -> bool {
+        return Keywords::new().values().any(|token| self == token);
+    }
+
     pub fn is_ident(&self) -> bool {
         match *self {
-            Self::Ident(_) | Self::Int(_) | Self::Function | Self::Let => true,
+            Self::Ident(_) | Self::Int(_) => true,
+            _ if self.is_keyword() => true,
             _ => false,
         }
     }
@@ -71,11 +98,7 @@ impl Lexer {
     }
 
     pub fn lookup_ident(ident: String) -> Token {
-        match ident.as_str() {
-            "fn" => Token::Function,
-            "let" => Token::Let,
-            _ => Token::Ident(ident),
-        }
+        Keywords::new().get(&ident).unwrap_or(Token::Ident(ident))
     }
 
     pub fn skip_whitespace(&mut self) {
