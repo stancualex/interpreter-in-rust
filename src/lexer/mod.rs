@@ -64,31 +64,23 @@ impl Lexer {
         self.read_position += 1;
     }
 
-    pub fn walk_back(&mut self) {
-        self.read_position -= 1;
-        self.position = self.read_position - 1;
-        self.ch = self.input.chars().nth(self.read_position);
-    }
-
     pub fn peek(&self) -> Option<char> {
         return self.input.chars().nth(self.read_position);
     }
 
     pub fn read_ident(&mut self) -> String {
         let pos = self.position;
-        while let Some('a'..='z' | 'A'..='Z' | '_') = self.ch {
+        while let Some('a'..='z' | 'A'..='Z' | '_') = self.peek() {
             self.read_char();
         }
-        self.walk_back();
         return String::from(&self.input[pos..self.read_position]);
     }
 
     pub fn read_int(&mut self) -> String {
         let pos = self.position;
-        while let Some('0'..='9') = self.ch {
+        while let Some('0'..='9') = self.peek() {
             self.read_char();
         }
-        self.walk_back();
         return String::from(&self.input[pos..self.read_position]);
     }
 
