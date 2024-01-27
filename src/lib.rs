@@ -1,5 +1,3 @@
-use std::collections::{hash_map::Values, HashMap};
-
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     Illegal,
@@ -39,48 +37,6 @@ pub enum Token {
     Return,
 }
 
-struct Keywords<'a> {
-    keywords: HashMap<&'a str, Token>,
-}
-
-impl<'a> Keywords<'a> {
-    fn new() -> Self {
-        Self {
-            keywords: HashMap::from([
-                ("fn", Token::Function),
-                ("let", Token::Let),
-                ("true", Token::True),
-                ("false", Token::False),
-                ("if", Token::If),
-                ("else", Token::Else),
-                ("return", Token::Return),
-            ]),
-        }
-    }
-
-    fn get(&self, key: &str) -> Option<Token> {
-        return self.keywords.get(key).cloned();
-    }
-
-    fn values(&self) -> Values<'_, &str, Token> {
-        return self.keywords.values();
-    }
-}
-
-impl Token {
-    pub fn is_keyword(&self) -> bool {
-        return Keywords::new().values().any(|token| self == token);
-    }
-
-    pub fn is_ident(&self) -> bool {
-        match *self {
-            Self::Ident(_) | Self::Int(_) => true,
-            _ if self.is_keyword() => true,
-            _ => false,
-        }
-    }
-}
-
 #[derive(Debug, Default)]
 pub struct Lexer {
     input: String,
@@ -105,6 +61,12 @@ impl Lexer {
         self.read_position += 1;
     }
 
+    pub fn walk_back(&mut self) {
+        self.read_position -= 1;
+        self.position = self.read_position - 1;
+        self.ch = self.input.chars().nth(self.read_position);
+    }
+
     pub fn peek(&self) -> Option<char> {
         return self.input.chars().nth(self.read_position);
     }
@@ -114,7 +76,8 @@ impl Lexer {
         while let Some('a'..='z' | 'A'..='Z' | '_') = self.ch {
             self.read_char();
         }
-        return String::from(&self.input[pos..self.position]);
+        self.walk_back();
+        return String::from(&self.input[pos..self.read_position]);
     }
 
     pub fn read_int(&mut self) -> String {
@@ -122,11 +85,21 @@ impl Lexer {
         while let Some('0'..='9') = self.ch {
             self.read_char();
         }
-        return String::from(&self.input[pos..self.position]);
+        self.walk_back();
+        return String::from(&self.input[pos..self.read_position]);
     }
 
     pub fn lookup_ident(ident: String) -> Token {
-        Keywords::new().get(&ident).unwrap_or(Token::Ident(ident))
+        match ident.as_str() {
+            "fn" => Token::Function,
+            "let" => Token::Let,
+            "true" => Token::True,
+            "false" => Token::False,
+            "if" => Token::If,
+            "else" => Token::Else,
+            "return" => Token::Return,
+            _ => Token::Ident(ident),
+        }
     }
 
     pub fn skip_whitespace(&mut self) {
@@ -186,9 +159,7 @@ impl Lexer {
             _ => Token::Illegal,
         });
 
-        if !token.is_ident() {
-            self.read_char();
-        }
+        self.read_char();
 
         return token;
     }
