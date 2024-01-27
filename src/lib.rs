@@ -17,6 +17,10 @@ pub enum Token {
 
     LessThan,
     GreaterThan,
+    Equal,
+    NotEqual,
+    LessEqual,
+    GreaterEqual,
 
     Comma,
     Semicolon,
@@ -101,6 +105,10 @@ impl Lexer {
         self.read_position += 1;
     }
 
+    pub fn peek(&self) -> Option<char> {
+        return self.input.chars().nth(self.read_position);
+    }
+
     pub fn read_ident(&mut self) -> String {
         let pos = self.position;
         while let Some('a'..='z' | 'A'..='Z' | '_') = self.ch {
@@ -131,14 +139,42 @@ impl Lexer {
         self.skip_whitespace();
 
         let token = self.ch.map_or(Token::Eof, |ch| match ch {
-            '=' => Token::Assign,
+            '=' => {
+                if let Some('=') = self.peek() {
+                    self.read_char();
+                    Token::Equal
+                } else {
+                    Token::Assign
+                }
+            }
             '+' => Token::Plus,
             '-' => Token::Minus,
-            '!' => Token::Bang,
+            '!' => {
+                if let Some('=') = self.peek() {
+                    self.read_char();
+                    Token::NotEqual
+                } else {
+                    Token::Bang
+                }
+            }
             '*' => Token::Asterisk,
             '/' => Token::Slash,
-            '>' => Token::GreaterThan,
-            '<' => Token::LessThan,
+            '>' => {
+                if let Some('=') = self.peek() {
+                    self.read_char();
+                    Token::GreaterEqual
+                } else {
+                    Token::GreaterThan
+                }
+            }
+            '<' => {
+                if let Some('=') = self.peek() {
+                    self.read_char();
+                    Token::LessEqual
+                } else {
+                    Token::LessThan
+                }
+            }
             ';' => Token::Semicolon,
             '(' => Token::LParen,
             ')' => Token::RParen,

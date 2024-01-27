@@ -44,7 +44,12 @@ fn test_next_complete() -> Result<()> {
             return true;
         } else {
             return false;
-        }"#
+        }
+
+        10 == 10;
+        10 != 9;
+        10 >= 9;
+        9 <= 10;"#
         .to_string();
     let mut lexer = Lexer::new(input);
 
@@ -114,6 +119,22 @@ fn test_next_complete() -> Result<()> {
         Token::False,
         Token::Semicolon,
         Token::RBrace,
+        Token::Int("10".into()),
+        Token::Equal,
+        Token::Int("10".into()),
+        Token::Semicolon,
+        Token::Int("10".into()),
+        Token::NotEqual,
+        Token::Int("9".into()),
+        Token::Semicolon,
+        Token::Int("10".into()),
+        Token::GreaterEqual,
+        Token::Int("9".into()),
+        Token::Semicolon,
+        Token::Int("9".into()),
+        Token::LessEqual,
+        Token::Int("10".into()),
+        Token::Semicolon,
         Token::Eof,
     ];
 
