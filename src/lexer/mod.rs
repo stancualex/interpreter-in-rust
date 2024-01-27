@@ -1,4 +1,7 @@
-#[derive(Debug, PartialEq, Clone)]
+#[cfg(test)]
+mod test;
+
+#[derive(Debug, PartialEq)]
 pub enum Token {
     Illegal,
     Eof,

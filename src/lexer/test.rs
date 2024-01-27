@@ -1,5 +1,5 @@
+use super::{Lexer, Token};
 use anyhow::Result;
-use interpreter::{Lexer, Token};
 
 #[test]
 fn test_next_token() -> Result<()> {
