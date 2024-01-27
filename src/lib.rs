@@ -10,6 +10,13 @@ pub enum Token {
 
     Assign,
     Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
+
+    LessThan,
+    GreaterThan,
 
     Comma,
     Semicolon,
@@ -24,7 +31,7 @@ pub enum Token {
 }
 
 pub struct Keywords<'a> {
-    pub keywords: HashMap<&'a str, Token>,
+    keywords: HashMap<&'a str, Token>,
 }
 
 impl<'a> Keywords<'a> {
@@ -112,11 +119,17 @@ impl Lexer {
 
         let token = self.ch.map_or(Token::Eof, |ch| match ch {
             '=' => Token::Assign,
+            '+' => Token::Plus,
+            '-' => Token::Minus,
+            '!' => Token::Bang,
+            '*' => Token::Asterisk,
+            '/' => Token::Slash,
+            '>' => Token::GreaterThan,
+            '<' => Token::LessThan,
             ';' => Token::Semicolon,
             '(' => Token::LParen,
             ')' => Token::RParen,
             ',' => Token::Comma,
-            '+' => Token::Plus,
             '{' => Token::LBrace,
             '}' => Token::RBrace,
             'a'..='z' | 'A'..='Z' | '_' => Lexer::lookup_ident(self.read_ident()),
