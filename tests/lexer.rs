@@ -26,3 +26,65 @@ fn test_next_token() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn test_next_complete() -> Result<()> {
+    let input = r#"let five = 5;
+        let ten = 10;
+        
+        let add = fn(x, y) {
+            x + y;
+        };
+
+        let result = add(five, ten);"#
+        .to_string();
+    let mut lexer = Lexer::new(input);
+
+    let tokens = [
+        Token::Let,
+        Token::Ident("five".into()),
+        Token::Assign,
+        Token::Int("5".into()),
+        Token::Semicolon,
+        Token::Let,
+        Token::Ident("ten".into()),
+        Token::Assign,
+        Token::Int("10".into()),
+        Token::Semicolon,
+        Token::Let,
+        Token::Ident("add".into()),
+        Token::Assign,
+        Token::Function,
+        Token::LParen,
+        Token::Ident("x".into()),
+        Token::Comma,
+        Token::Ident("y".into()),
+        Token::RParen,
+        Token::LBrace,
+        Token::Ident("x".into()),
+        Token::Plus,
+        Token::Ident("y".into()),
+        Token::Semicolon,
+        Token::RBrace,
+        Token::Semicolon,
+        Token::Let,
+        Token::Ident("result".into()),
+        Token::Assign,
+        Token::Ident("add".into()),
+        Token::LParen,
+        Token::Ident("five".into()),
+        Token::Comma,
+        Token::Ident("ten".into()),
+        Token::RParen,
+        Token::Semicolon,
+        Token::Eof,
+    ];
+
+    for token in tokens {
+        let next = lexer.next_token();
+        println!("expected {:?}, received {:?}", token, next);
+        assert_eq!(token, next);
+    }
+
+    Ok(())
+}
