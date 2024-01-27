@@ -28,24 +28,37 @@ pub enum Token {
 
     Function,
     Let,
+    True,
+    False,
+    If,
+    Else,
+    Return,
 }
 
-pub struct Keywords<'a> {
+struct Keywords<'a> {
     keywords: HashMap<&'a str, Token>,
 }
 
 impl<'a> Keywords<'a> {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {
-            keywords: HashMap::from([("fn", Token::Function), ("let", Token::Let)]),
+            keywords: HashMap::from([
+                ("fn", Token::Function),
+                ("let", Token::Let),
+                ("true", Token::True),
+                ("false", Token::False),
+                ("if", Token::If),
+                ("else", Token::Else),
+                ("return", Token::Return),
+            ]),
         }
     }
 
-    pub fn get(&self, key: &str) -> Option<Token> {
+    fn get(&self, key: &str) -> Option<Token> {
         return self.keywords.get(key).cloned();
     }
 
-    pub fn values(&self) -> Values<'_, &str, Token> {
+    fn values(&self) -> Values<'_, &str, Token> {
         return self.keywords.values();
     }
 }
@@ -132,7 +145,7 @@ impl Lexer {
             ',' => Token::Comma,
             '{' => Token::LBrace,
             '}' => Token::RBrace,
-            'a'..='z' | 'A'..='Z' | '_' => Lexer::lookup_ident(self.read_ident()),
+            'a'..='z' | 'A'..='Z' | '_' => Self::lookup_ident(self.read_ident()),
             '0'..='9' => Token::Int(self.read_int()),
             _ => Token::Illegal,
         });

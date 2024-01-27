@@ -38,7 +38,13 @@ fn test_next_complete() -> Result<()> {
 
         let result = add(five, ten);
         !-/*5;
-        5 < 10 > 5;"#
+        5 < 10 > 5;
+        
+        if (5 < 10) {
+            return true;
+        } else {
+            return false;
+        }"#
         .to_string();
     let mut lexer = Lexer::new(input);
 
@@ -91,6 +97,23 @@ fn test_next_complete() -> Result<()> {
         Token::GreaterThan,
         Token::Int("5".into()),
         Token::Semicolon,
+        Token::If,
+        Token::LParen,
+        Token::Int("5".into()),
+        Token::LessThan,
+        Token::Int("10".into()),
+        Token::RParen,
+        Token::LBrace,
+        Token::Return,
+        Token::True,
+        Token::Semicolon,
+        Token::RBrace,
+        Token::Else,
+        Token::LBrace,
+        Token::Return,
+        Token::False,
+        Token::Semicolon,
+        Token::RBrace,
         Token::Eof,
     ];
 
